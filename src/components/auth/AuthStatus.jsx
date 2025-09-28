@@ -282,7 +282,7 @@ const AuthStatus = ({
                 Debug Info (Desarrollo)
               </summary>
               <pre className="profile-debug-content">
-                {JSON.stringify(auth.getDebugInfo(), null, 2)}
+                {JSON.stringify(auth.getDebugInfo?.() || { error: 'Debug info not available' }, null, 2)}
               </pre>
             </details>
           )}

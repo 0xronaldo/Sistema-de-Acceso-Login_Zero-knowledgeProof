@@ -251,11 +251,17 @@ export const useWallet = () => {
     checkNetwork,
     
     // Utilidades
-    isWalletAvailable: walletService.isWalletAvailable(),
+    isWalletAvailable: typeof walletService.isWalletAvailable === 'function' ? walletService.isWalletAvailable() : false,
     supportedNetworks: Object.values(NETWORKS),
     
     // Debug
-    getDebugInfo: walletService.getDebugInfo
+    getDebugInfo: () => {
+      try {
+        return typeof walletService.getDebugInfo === 'function' ? walletService.getDebugInfo() : { error: 'getDebugInfo not available' };
+      } catch (error) {
+        return { error: 'Failed to get wallet debug info', message: error.message };
+      }
+    }
   };
 };
 

@@ -237,13 +237,21 @@ export const useAuth = () => {
    * Obtiene información de debug
    */
   const getDebugInfo = useCallback(() => {
-    return {
-      authService: authService.getDebugInfo(),
-      wallet: wallet.getDebugInfo?.(),
-      zkp: zkp.getDebugInfo?.(),
-      currentState: authState,
-      timestamp: new Date().toISOString()
-    };
+    try {
+      return {
+        authService: authService?.getDebugInfo?.() || { error: 'authService.getDebugInfo not available' },
+        wallet: wallet?.getDebugInfo?.() || { error: 'wallet.getDebugInfo not available' },
+        zkp: zkp?.getDebugInfo?.() || { error: 'zkp.getDebugInfo not available' },
+        currentState: authState,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      return {
+        error: 'Failed to get debug info',
+        message: error.message,
+        timestamp: new Date().toISOString()
+      };
+    }
   }, [authState, wallet, zkp]);
 
   /**
