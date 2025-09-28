@@ -1,45 +1,22 @@
-# 🔐 ZKP Login Demo - Sistema de Autenticación con Zero Knowledge Proofs
+# 🔐 ZKP - Sistema de Autenticación con Zero Knowledge Proofs
 
 Una implementación educativa completa de un sistema de autenticación basado en Zero Knowledge Proofs (ZKP) usando PrivadoID y Polygon Amoy Testnet.
 
-## 🎯 Objetivo del Proyecto
+##  Características Principales
 
-Este proyecto demuestra cómo implementar un sistema de autenticación moderno que combina:
-- **Zero Knowledge Proofs** para privacidad y seguridad
-- **Autenticación por Wallet** (MetaMask, etc.)
-- **Login tradicional** con verificación ZKP
-- **Identidades descentralizadas** (DIDs)
-- **Claims verificables** sin revelar datos sensibles
-
-## ✨ Características Principales
-
-### 🔗 Autenticación por Wallet
+### Autenticación por Wallet
 - Conexión con MetaMask y otras wallets compatibles
 - Validación automática de red (Polygon Amoy)
 - Generación automática de identidad ZKP basada en la dirección
 - Prueba de propiedad de wallet sin revelar claves privadas
 
-### 👤 Autenticación Tradicional
+###  Autenticación Tradicional
 - Registro con email/contraseña + generación de identidad ZKP
 - Login con verificación ZKP personalizada
 - Claims verificables con información del usuario
 - Identidades determinísticas y reproducibles
 
-### 🔒 Componentes ZKP Educativos
-- **ZKPGenerator**: Generación visual de pruebas paso a paso
-- **ZKPVerifier**: Verificación criptográfica con logs detallados
-- **CredentialManager**: Gestión completa de identidades y claims
-- Tooltips y explicaciones educativas en cada proceso
-
-### 🎨 Interfaz de Usuario
-- Diseño moderno con CSS Custom Properties (CSS Variables)
-- Componentes reutilizables (Button, Input, Modal)
-- Sistema de colores consistente con variables CSS
-- Estados de loading y progreso visual
-- Manejo robusto de errores
-- Responsive design sin dependencias externas
-
-## 🚀 Instalación y Configuración
+##  Instalación y Configuración
 
 ### Prerrequisitos
 - Node.js 16+ y npm
@@ -168,7 +145,7 @@ graph TD
     H --> I[Autenticación Exitosa]
 ```
 
-## 🧩 Componentes Clave
+## Componentes Clave
 
 ### LoginContainer
 Componente principal que orquesta todo el flujo de autenticación.
@@ -200,15 +177,6 @@ Genera pruebas ZKP de forma educativa.
   showEducationalContent={true}
 />
 ```
-
-## 🎓 Conceptos Educativos
-
-### Zero Knowledge Proofs (ZKP)
-Las ZKP permiten demostrar que conoces un secreto sin revelarlo. En este proyecto:
-- **Prover**: Genera una prueba de que posee cierta información
-- **Verifier**: Valida la prueba sin conocer la información original
-- **Witness**: Los datos privados que se quieren probar
-- **Public Signals**: Información pública necesaria para la verificación
 
 ### Identidades Descentralizadas (DIDs)
 ```
@@ -282,18 +250,6 @@ export const NETWORKS = {
 };
 ```
 
-## 🐛 Solución de Problemas
-
-### Error: Wallet no conectada
-- Verificar que MetaMask esté instalado
-- Asegurar que el sitio tenga permisos
-- Verificar que la wallet esté desbloqueada
-
-### Error: Red incorrecta
-- Cambiar a Polygon Amoy en MetaMask
-- Verificar configuración de red
-- Intentar agregar la red manualmente
-
 ### Error: PrivadoID service unavailable
 - Verificar configuración en `.env`
 - En modo simulación: normal (funciona offline)
@@ -304,67 +260,9 @@ export const NETWORKS = {
 - Revisar logs en la consola del navegador
 - Verificar configuración de circuitos
 
-## 📚 Recursos Adicionales
+## Recursos Adicionales
 
 ### Documentación
 - [PrivadoID Documentation](https://docs.privado.id/)
 - [Polygon Documentation](https://docs.polygon.technology/)
 - [Zero Knowledge Proofs](https://z.cash/technology/zksnarks/)
-
-### Tutoriales
-- [Getting Started with PrivadoID](https://docs.privado.id/docs/getting-started)
-- [Polygon Development](https://docs.polygon.technology/develop/)
-- [React Hooks Guide](https://reactjs.org/docs/hooks-intro.html)
-
-## 🤝 Contribuir
-
-1. Fork el proyecto
-2. Crear branch para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push al branch (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
-
-## ⚠️ Disclaimer
-
-**Este es un proyecto educativo.** No usar en producción sin:
-- Auditorías de seguridad completas
-- Configuración robusta de PrivadoID
-- Implementación de mejores prácticas de seguridad
-- Testing exhaustivo
-- Infraestructura de producción adecuada
-
-## 👥 Autor
-
-Creado con ❤️ para aprender y enseñar Zero Knowledge Proofs.
-
----
-
-**¿Preguntas?** Abre un issue o consulta la documentación de los proyectos relacionados.
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
