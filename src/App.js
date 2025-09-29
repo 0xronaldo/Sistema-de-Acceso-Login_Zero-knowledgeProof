@@ -5,18 +5,28 @@
 
 import React, { useState } from 'react';
 import SimpleLoginContainer from './components/auth/SimpleLoginContainer';
+import BackendConnectionTest from './components/ui/BackendConnectionTest';
+import RealCredentialManager from './components/zkp/RealCredentialManager';
 import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
 
   const handleAuthSuccess = (result) => {
     console.log('🎉 Autenticación exitosa:', result);
     setUser(result.user);
+    setSession(result.session);
   };
 
   const handleAuthError = (error) => {
     console.error('❌ Error de autenticación:', error);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setSession(null);
+    localStorage.removeItem('zkp_user_session');
   };
 
   return (
@@ -46,6 +56,12 @@ function App() {
                 <span className="app-user-text">
                   Bienvenido, {user.formattedAddress || user.name || 'Usuario'}
                 </span>
+                <button
+                  onClick={handleLogout}
+                  className="ml-4 text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                >
+                  Logout
+                </button>
               </div>
             )}
           </div>
@@ -64,10 +80,46 @@ function App() {
             </p>
           </div>
 
-          <SimpleLoginContainer
-            onAuthSuccess={handleAuthSuccess}
-            onAuthError={handleAuthError}
-          />
+          {!user ? (
+            <>
+              <SimpleLoginContainer
+                onAuthSuccess={handleAuthSuccess}
+                onAuthError={handleAuthError}
+              />
+              
+              {/* Componente de prueba del backend */}
+              <div className="mt-8">
+                <BackendConnectionTest />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Dashboard del usuario autenticado */}
+              <div className="space-y-8">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                  <h2 className="text-xl font-semibold text-green-800 mb-2">
+                    ¡Autenticación Exitosa! 🎉
+                  </h2>
+                  <p className="text-green-700">
+                    Has sido autenticado exitosamente usando Zero Knowledge Proofs.
+                  </p>
+                  {user.zkpDID && (
+                    <div className="mt-3 p-3 bg-green-100 rounded">
+                      <p className="text-sm text-green-800">
+                        <strong>DID:</strong> {user.zkpDID}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Gestión de credenciales */}
+                <RealCredentialManager user={user} session={session} />
+                
+                {/* Componente de prueba del backend */}
+                <BackendConnectionTest />
+              </div>
+            </>
+          )}
         </div>
       </main>
 

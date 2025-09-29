@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import authService from '../services/authService';
+import backendZKPService from '../services/backendZKPService';
 import { AUTH_STATES, AUTH_METHODS, ERROR_MESSAGES } from '../utils/constants';
 import useWallet from './useWallet';
 import useZKP from './useZKP';
@@ -61,7 +62,7 @@ export const useAuth = () => {
   }, [updateAuthState]);
 
   /**
-   * Autenticación por wallet con ZKP
+   * Autenticación por wallet con ZKP usando backend real
    */
   const authenticateWithWallet = useCallback(async () => {
     try {
@@ -71,26 +72,78 @@ export const useAuth = () => {
         error: null
       }));
 
+      console.log('🔐 [useAuth] Iniciando autenticación por wallet con backend...');
+
       // Conectar wallet si no está conectada
       if (!wallet.isConnected) {
+        console.log('💼 [useAuth] Conectando wallet...');
         await wallet.connectWallet();
       }
 
       // Verificar red correcta
       if (!wallet.isCorrectNetwork) {
+        console.log('🔄 [useAuth] Cambiando a red Polygon Amoy...');
         await wallet.switchToPolygonAmoy();
       }
 
-      // Autenticar con el servicio
-      const result = await authService.authenticateWithWallet();
-      
-      updateAuthState();
-      
-      return result;
+      // Obtener información de la wallet
+      const walletInfo = {
+        address: wallet.account,
+        formattedAddress: wallet.formattedAccount,
+        network: {
+          name: wallet.network?.name || 'Polygon Amoy',
+          chainId: wallet.network?.chainId || 80002
+        }
+      };
+
+      console.log('📝 [useAuth] Creando credencial en Issuer Node...', walletInfo);
+
+      // Usar el servicio de backend para crear credencial real
+      const result = await backendZKPService.authenticateWithWallet(walletInfo);
+
+      console.log('✅ [useAuth] Credencial creada exitosamente:', result);
+
+      // Actualizar estado de autenticación
+      const user = {
+        id: result.identity?.identifier || wallet.account,
+        method: 'wallet',
+        address: walletInfo.address,
+        formattedAddress: walletInfo.formattedAddress,
+        network: walletInfo.network,
+        zkpDID: result.identity?.identifier,
+        zkpIdentity: result.identity,
+        zkpClaim: result.claim,
+        qrCode: result.qrCode
+      };
+
+      const session = {
+        id: user.id,
+        method: 'wallet',
+        user: user,
+        authenticatedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      };
+
+      setAuthState(prev => ({
+        ...prev,
+        isAuthenticated: true,
+        user: user,
+        session: session
+      }));
+
+      // Guardar en localStorage
+      localStorage.setItem('zkp_user_session', JSON.stringify(session));
+
+      return {
+        success: true,
+        user: user,
+        session: session,
+        credential: result
+      };
 
     } catch (error) {
-      console.error('Error en autenticación por wallet:', error);
-      const errorMessage = ERROR_MESSAGES[error.message] || error.message;
+      console.error('❌ [useAuth] Error en autenticación por wallet:', error);
+      const errorMessage = error.message || 'Error desconocido en autenticación';
       
       setAuthState(prev => ({
         ...prev,
@@ -128,16 +181,45 @@ export const useAuth = () => {
         throw new Error('Email inválido');
       }
 
-      // Registrar en el servicio
-      const result = await authService.registerUser(userData);
+      console.log('📝 [useAuth] Registrando nuevo usuario...');
+
+      // Verificar si el usuario ya existe
+      const existingUsers = JSON.parse(localStorage.getItem('zkp_registered_users') || '[]');
+      const existingUser = existingUsers.find(u => u.email === userData.email);
+      
+      if (existingUser) {
+        throw new Error('El usuario ya está registrado');
+      }
+
+      // Crear nuevo usuario
+      const newUser = {
+        id: btoa(userData.email).replace(/=/g, ''),
+        name: userData.name,
+        email: userData.email,
+        passwordHash: btoa(userData.password), // Hash simple para demo
+        registeredAt: new Date().toISOString()
+      };
+
+      // Guardar en localStorage
+      const updatedUsers = [...existingUsers, newUser];
+      localStorage.setItem('zkp_registered_users', JSON.stringify(updatedUsers));
       
       // Actualizar lista de usuarios registrados
       setAuthState(prev => ({
         ...prev,
-        registeredUsers: [...prev.registeredUsers, result.user]
+        registeredUsers: updatedUsers
       }));
 
-      return result;
+      console.log('✅ [useAuth] Usuario registrado exitosamente:', newUser);
+
+      return {
+        success: true,
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          email: newUser.email
+        }
+      };
 
     } catch (error) {
       console.error('Error en registro:', error);
@@ -156,7 +238,7 @@ export const useAuth = () => {
   }, []);
 
   /**
-   * Autenticación tradicional con ZKP
+   * Autenticación tradicional con ZKP usando backend real
    */
   const authenticateWithCredentials = useCallback(async (credentials) => {
     try {
@@ -166,21 +248,79 @@ export const useAuth = () => {
         error: null
       }));
 
+      console.log('🔐 [useAuth] Iniciando autenticación tradicional con backend...');
+
       // Validar credenciales básicas
       if (!credentials.email || !credentials.password) {
         throw new Error('Email y contraseña son requeridos');
       }
 
-      // Autenticar con el servicio
-      const result = await authService.authenticateWithCredentials(credentials);
+      // Verificar si el usuario existe en localStorage
+      const registeredUsers = JSON.parse(localStorage.getItem('zkp_registered_users') || '[]');
+      const user = registeredUsers.find(u => u.email === credentials.email);
       
-      updateAuthState();
-      
-      return result;
+      if (!user) {
+        throw new Error('Usuario no registrado. Por favor regístrate primero.');
+      }
+
+      // Verificar contraseña (hash simple)
+      const passwordHash = btoa(credentials.password);
+      if (passwordHash !== user.passwordHash) {
+        throw new Error('Credenciales inválidas');
+      }
+
+      console.log('📝 [useAuth] Creando credencial para usuario tradicional...', user);
+
+      // Usar el servicio de backend para crear credencial real
+      const userData = {
+        name: user.name,
+        email: user.email
+      };
+
+      const result = await backendZKPService.authenticateWithCredentials(userData);
+
+      console.log('✅ [useAuth] Credencial tradicional creada exitosamente:', result);
+
+      // Actualizar estado de autenticación
+      const authUser = {
+        id: result.identity?.identifier || user.id,
+        method: 'traditional',
+        name: user.name,
+        email: user.email,
+        zkpDID: result.identity?.identifier,
+        zkpIdentity: result.identity,
+        zkpClaim: result.claim,
+        qrCode: result.qrCode
+      };
+
+      const session = {
+        id: authUser.id,
+        method: 'traditional',
+        user: authUser,
+        authenticatedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      };
+
+      setAuthState(prev => ({
+        ...prev,
+        isAuthenticated: true,
+        user: authUser,
+        session: session
+      }));
+
+      // Guardar en localStorage
+      localStorage.setItem('zkp_user_session', JSON.stringify(session));
+
+      return {
+        success: true,
+        user: authUser,
+        session: session,
+        credential: result
+      };
 
     } catch (error) {
-      console.error('Error en autenticación tradicional:', error);
-      const errorMessage = ERROR_MESSAGES[error.message] || error.message;
+      console.error('❌ [useAuth] Error en autenticación tradicional:', error);
+      const errorMessage = error.message || 'Error desconocido en autenticación';
       
       setAuthState(prev => ({
         ...prev,

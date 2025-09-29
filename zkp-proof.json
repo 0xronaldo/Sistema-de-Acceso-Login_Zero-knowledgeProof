@@ -1,0 +1,35 @@
+{
+  "type": "wallet",
+  "address": "0x4279c8ec7306ea8bf818d5f856fa56b11c35b552",
+  "network": "Polygon Amoy Testnet",
+  "proof": {
+    "protocol": "groth16",
+    "curve": "bn128",
+    "proof": {
+      "a": [
+        "b6114d9823a9d1c5c6272bd89db6dac9",
+        "058de96d89ccf9c12428dbce4fc2b278"
+      ],
+      "b": [
+        [
+          "052d1c0246fcdcb4c0821bab1089579b",
+          "84104972a3261c279fb7d012d9b38e7b"
+        ],
+        [
+          "169243a0ac0ee2705cb64cab192f380d",
+          "2d8d1a261f3db77d708c4eb8cb4a7548"
+        ]
+      ],
+      "c": [
+        "ebaa575b29ce7f0ac60aa66c49d3df95",
+        "4e68533037c9d0e9889bbdfde2358058"
+      ]
+    },
+    "publicSignals": [
+      "12b31f5763d0b5ae",
+      "5332e6ec0148d9f9",
+      "10bcb09d0cfae9a2"
+    ],
+    "timestamp": 1759174562725
+  }
+}

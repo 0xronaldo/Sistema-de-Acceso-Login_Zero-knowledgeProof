@@ -1,12 +1,10 @@
 /**
- * Componente CredentialManager - Gestor educativo de credenciales ZKP
- * Muestra y gestiona identidades, claims y credenciales
+ * Componente de gestión de credenciales ZKP
+ * Muestra las credenciales del usuario autenticado y permite realizar acciones
  */
 
-import React, { useState } from 'react';
-import Button from '../ui/Button';
-import Modal from '../ui/Modal';
-import { EDUCATIONAL_CONTENT, PRIVADO_CONFIG } from '../../utils/constants';
+import React, { useState, useEffect } from 'react';
+import backendZKPService from '../../services/backendZKPService';
 
 const CredentialManager = ({
   identity,
